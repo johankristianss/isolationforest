@@ -114,24 +114,21 @@ TEST(isolation_tree, select_split_value) {
 
   split_value_sum = 0.0;
   for (int i = 0; i < runs; i++) {
-    auto [split_value, all_values_equal] = itree->select_split_value(data, 0);
-    split_value_sum += split_value;
+    split_value_sum += itree->select_split_value(data, 0);
   }
   double split_value_mean = split_value_sum / runs;
   EXPECT_TRUE(split_value_mean > 4.5 && split_value_mean < 5.5);
 
   split_value_sum = 0.0;
   for (int i = 0; i < runs; i++) {
-    auto [split_value, all_values_equal] = itree->select_split_value(data, 1);
-    split_value_sum += split_value;
+    split_value_sum += itree->select_split_value(data, 1);
   }
   split_value_mean = split_value_sum / runs;
 
   split_value_sum = 0.0;
   EXPECT_TRUE(split_value_mean > 900 && split_value_mean < 1100);
   for (int i = 0; i < runs; i++) {
-    auto [split_sum, all_values_equal] = itree->select_split_value(data, 2);
-    split_value_sum += split_sum;
+    split_value_sum += itree->select_split_value(data, 2);
   }
   split_value_mean = split_value_sum / runs;
   EXPECT_TRUE(split_value_mean > 1.2 && split_value_mean < 1.4);
@@ -147,7 +144,7 @@ TEST(isolation_tree, split_test_1) {
   // clang-format on
 
   auto itree = isolation_tree::create();
-  auto [above, below] = itree->split(data, 0, 0.1, false);
+  auto [above, below] = itree->split(data, 0, 0.1);
 
   matrix expected_above(1, 3);
   // clang-format off
@@ -176,7 +173,7 @@ TEST(isolation_tree, split_test_2) {
   // clang-format on
 
   auto itree = isolation_tree::create();
-  auto [above, below] = itree->split(data, 1, 20.0, false);
+  auto [above, below] = itree->split(data, 1, 20.0);
 
   matrix expected_above(3, 3);
   // clang-format off
@@ -205,7 +202,7 @@ TEST(isolation_tree, split_test_3) {
   // clang-format on
 
   auto itree = isolation_tree::create();
-  auto [above, below] = itree->split(data, 2, 1.0, false);
+  auto [above, below] = itree->split(data, 2, 1.0);
 
   matrix expected_below(4, 3);
   // clang-format off

@@ -21,8 +21,7 @@ PYBIND11_MODULE(iceml, m) {
         .def("fit", &isolation_forest::fit)
         .def("expected_path_lengths", &isolation_forest::expected_path_lengths)
         .def("anom_score", &isolation_forest::anom_score)
-        .def("anomalies", &isolation_forest::anomalies)
-        .def("get_subsample", &isolation_forest::get_subsample);
+        .def("anomalies", &isolation_forest::anomalies);
 
     pybind11::class_<isolation_tree, s_ptr<isolation_tree>>(m, "isolation_tree")
         .def_static("create", &isolation_tree::create)

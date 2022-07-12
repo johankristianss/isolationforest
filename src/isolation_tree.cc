@@ -30,8 +30,8 @@ error isolation_tree::fit(const matrix& data, const int max_depth) {
 
 void isolation_tree::build_tree(const matrix& data, s_ptr<node> node, const int current_depth, const int max_depth) {
     auto selected_feature = this->select_feature(data);
-    auto [split_value, all_values_equal] = this->select_split_value(data, selected_feature);
-    auto [above, below] = this->split(data, selected_feature, split_value, all_values_equal);
+    auto split_value = this->select_split_value(data, selected_feature);
+    auto [above, below] = this->split(data, selected_feature, split_value);
     auto left_node = node::create(selected_feature, split_value);
     auto right_node = node::create(selected_feature, split_value);
 
@@ -40,13 +40,13 @@ void isolation_tree::build_tree(const matrix& data, s_ptr<node> node, const int 
     node->left_node = left_node;
     node->right_node = right_node;
 
-    if (above.rows() <= 1 || current_depth == max_depth) {
+    if (above.rows() == 1 || current_depth == max_depth) {
         return;
     } else {
         build_tree(above, left_node, current_depth + 1, max_depth);
     }
 
-    if (below.rows() <= 1 || current_depth == max_depth) {
+    if (below.rows() == 1 || current_depth == max_depth) {
         return;
     } else {
         build_tree(below, right_node, current_depth + 1, max_depth);
@@ -60,6 +60,7 @@ matrix isolation_tree::path_lengths(const matrix& data) {
     for (int i = 0; i < data.rows(); i++) {
         auto row = data.row(i);
         path_length = path_length_recursively(this->root_node, row, 1);
+        //        std::cout << path_length << std::endl;
         path_lengths(i) = path_length;
     }
 
@@ -85,6 +86,8 @@ void isolation_tree::print_tree() {
 }
 
 void isolation_tree::print_tree_recursively(s_ptr<node> node) {
+    std::cout << "(" << node->selected_feature << ", " << node->split_value << ")";
+
     if (node->left_node != nullptr) {
         print_tree_recursively(node->left_node);
     }
@@ -98,29 +101,24 @@ int isolation_tree::select_feature(const matrix& data) {
     return rand() % (data.cols());
 }
 
-pair<double, bool> isolation_tree::select_split_value(const matrix& data, int feature) {
+double isolation_tree::select_split_value(const matrix& data, int feature) {
     // note that the block abstraction has zero runtime cost
     // see https://eigen.tuxfamily.org/dox/group__TutorialBlockOperations.html for more info
     auto col = data.block(0, feature, data.rows(), 1);
-    double min_value = col.minCoeff();
-    double max_value = col.maxCoeff();
+
+    double minValue = col.minCoeff();
+    double maxValue = col.maxCoeff();
 
     // TODO: is it safe to call the functions below many times?
-    std::uniform_real_distribution<> dis(min_value, max_value);
+    std::uniform_real_distribution<> dis(minValue, maxValue);
     std::random_device rd;
     std::mt19937 gen(rd());
-    return {dis(gen), min_value == max_value};
+    return dis(gen);
 }
 
 const pair<matrix, matrix> isolation_tree::split(const matrix& data,
-                                                 int selected_feature,
-                                                 double split_value,
-                                                 bool all_values_equal) {
-    if (all_values_equal) {
-        matrix empty(0, data.cols());
-        return {data, empty};
-    }
-
+                                                 const int selected_feature,
+                                                 const double split_value) {
     matrix above(0, data.cols());
     matrix below(0, data.cols());
 

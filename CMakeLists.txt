@@ -26,20 +26,18 @@ include_directories(${PROJECT_SOURCE_DIR}/vendor/eigen)
 # Source files
 set(ML_SOURCES
   ${PROJECT_SOURCE_DIR}/src/error.cc
-  ${PROJECT_SOURCE_DIR}/src/ext_isolation_tree.cc
   ${PROJECT_SOURCE_DIR}/src/isolation_forest.cc
+  ${PROJECT_SOURCE_DIR}/src/isolation_tree.cc
   ${PROJECT_SOURCE_DIR}/src/node.cc
   ${PROJECT_SOURCE_DIR}/src/test.cc
 )
 
 # Test source files
 set(ML_TEST_SOURCES
-  ${PROJECT_SOURCE_DIR}/tests/ext_isolation_tree_test.cc
   ${PROJECT_SOURCE_DIR}/tests/isolation_forest_test.cc
   ${PROJECT_SOURCE_DIR}/tests/isolation_tree_test.cc
   ${PROJECT_SOURCE_DIR}/tests/node_test.cc
 )
-
 add_library(ml SHARED ${ML_SOURCES})
 
 # Unit tests
@@ -48,7 +46,7 @@ add_executable(ml_unittest ${ML_TEST_SOURCES})
 target_link_libraries(ml_unittest ml ${CMAKE_THREAD_LIBS_INIT} gtest)
 
 # Main
-add_executable(main ${PROJECT_SOURCE_DIR}/src/main.cc)
+add_executable(main ${PROJECT_SOURCE_DIR}/main/main.cc)
 target_link_libraries(main ml ${CMAKE_THREAD_LIBS_INIT})
 
 # Pything bindings 
